@@ -1,0 +1,171 @@
+%File: anonymous-submission-latex-2025.tex
+\documentclass[letterpaper]{article} % DO NOT CHANGE THIS
+\usepackage[submission]{aaai25}  % DO NOT CHANGE THIS
+\usepackage{times}  % DO NOT CHANGE THIS
+\usepackage{helvet}  % DO NOT CHANGE THIS
+\usepackage{courier}  % DO NOT CHANGE THIS
+\usepackage[hyphens]{url}  % DO NOT CHANGE THIS
+\usepackage{graphicx} % DO NOT CHANGE THIS
+\urlstyle{rm} % DO NOT CHANGE THIS
+\def\UrlFont{\rm}  % DO NOT CHANGE THIS
+\usepackage{natbib}  % DO NOT CHANGE THIS AND DO NOT ADD ANY OPTIONS TO IT
+\usepackage{caption} % DO NOT CHANGE THIS AND DO NOT ADD ANY OPTIONS TO IT
+\frenchspacing  % DO NOT CHANGE THIS
+\setlength{\pdfpagewidth}{8.5in} % DO NOT CHANGE THIS
+\setlength{\pdfpageheight}{11in} % DO NOT CHANGE THIS
+%
+% These are recommended to typeset algorithms but not required. See the subsubsection on algorithms. Remove them if you don't have algorithms in your paper.
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+%
+% These are are recommended to typeset listings but not required. See the subsubsection on listing. Remove this block if you don't have listings in your paper.
+\usepackage{newfloat}
+\usepackage{listings}
+\DeclareCaptionStyle{ruled}{labelfont=normalfont,labelsep=colon,strut=off} % DO NOT CHANGE THIS
+\lstset{%
+	basicstyle={\footnotesize\ttfamily},% footnotesize acceptable for monospace
+	numbers=left,numberstyle=\footnotesize,xleftmargin=2em,% show line numbers, remove this entire line if you don't want the numbers.
+	aboveskip=0pt,belowskip=0pt,%
+	showstringspaces=false,tabsize=2,breaklines=true}
+\floatstyle{ruled}
+\newfloat{listing}{tb}{lst}{}
+\floatname{listing}{Listing}
+%
+% Keep the \pdfinfo as shown here. There's no need
+% for you to add the /Title and /Author tags.
+\pdfinfo{
+/TemplateVersion (2025.1)
+}
+
+% DISALLOWED PACKAGES
+% \usepackage{authblk} -- This package is specifically forbidden
+% \usepackage{balance} -- This package is specifically forbidden
+% \usepackage{color (if used in text)
+% \usepackage{CJK} -- This package is specifically forbidden
+% \usepackage{float} -- This package is specifically forbidden
+% \usepackage{flushend} -- This package is specifically forbidden
+% \usepackage{fontenc} -- This package is specifically forbidden
+% \usepackage{fullpage} -- This package is specifically forbidden
+% \usepackage{geometry} -- This package is specifically forbidden
+% \usepackage{grffile} -- This package is specifically forbidden
+% \usepackage{hyperref} -- This package is specifically forbidden
+% \usepackage{navigator} -- This package is specifically forbidden
+% (or any other package that embeds links such as navigator or hyperref)
+% \indentfirst} -- This package is specifically forbidden
+% \layout} -- This package is specifically forbidden
+% \multicol} -- This package is specifically forbidden
+% \nameref} -- This package is specifically forbidden
+% \usepackage{savetrees} -- This package is specifically forbidden
+% \usepackage{setspace} -- This package is specifically forbidden
+% \usepackage{stfloats} -- This package is specifically forbidden
+% \usepackage{tabu} -- This package is specifically forbidden
+% \usepackage{titlesec} -- This package is specifically forbidden
+% \usepackage{tocbibind} -- This package is specifically forbidden
+% \usepackage{ulem} -- This package is specifically forbidden
+% \usepackage{wrapfig} -- This package is specifically forbidden
+% DISALLOWED COMMANDS
+% \nocopyright -- Your paper will not be published if you use this command
+% \addtolength -- This command may not be used
+% \balance -- This command may not be used
+% \baselinestretch -- Your paper will not be published if you use this command
+% \clearpage -- No page breaks of any kind may be used for the final version of your paper
+% \columnsep -- This command may not be used
+% \newpage -- No page breaks of any kind may be used for the final version of your paper
+% \pagebreak -- No page breaks of any kind may be used for the final version of your paperr
+% \pagestyle -- This command may not be used
+% \tiny -- This is not an acceptable font size.
+% \vspace{- -- No negative value may be used in proximity of a caption, figure, table, section, subsection, subsubsection, or reference
+% \vskip{- -- No negative value may be used to alter spacing above or below a caption, figure, table, section, subsection, subsubsection, or reference
+
+\setcounter{secnumdepth}{0} %May be changed to 1 or 2 if section numbers are desired.
+
+% The file aaai25.sty is the style file for AAAI Press
+% proceedings, working notes, and technical reports.
+%
+
+% Title
+\title{Project Proposal \\ \\ Multi-Label Generalized Zero Shot Learning for the Classification of Disease in Chest Radiographs (CXR-ML-GZSL)}
+\author{
+    Mario Abdelsayed\\
+    Luis Ramos\\
+}
+
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+\subsection{Problem Statement}
+
+Deep learning models have been employed in health care in classifying disease and
+aiding diagnosis to great effect. One limitation of these models is that they require large
+amounts of annotated data that are expensive to acquire. Another limitation the models
+suffer from is the inability to assign detect classes absent in the training dataset. It is
+difficult to collect data at the volume required to train a model, particularly in the
+case of rare and novel diseases.
+
+Zero shot learning (ZSL) has produced some impressive results classifying unseen
+classes. Despite that success, the methods proposed only assign one label while in
+medical imaging tasks, images often contain more than one disease. This paper proposes a
+novel method that combines information from the visual features of images and semantic
+embeddings from rich medical text corpus with the goal of assigning multiple labels to natural chest X-Ray images that could be in both seen and unseen classes.
+
+
+\subsection{Citation to the Original Paper}
+
+Hayat, N., Lashen, H., \& Shamout, F. E. (2021). Multi-Label Generalized Zero Shot Learning
+for the Classification of Disease in Chest Radiographs [arXiv preprint arXiv:2107.06563].
+https://arxiv.org/abs/2107.06563
+
+\section{Methodology}
+
+\subsection{Specific Approach}
+
+\begin{itemize}
+    \item The approach employed deploys a Zero-Shot learning method that uses semantic embeddings along with visual features to classify images with unseen classes. Both semantic and visual features go through mapping modules that project the features into the same latent space where a comparison using Cosine similarity can be performed.
+    \item  A confidence margin (\( \delta \)) is enforced to mitigate the hubness problem.
+    \item A DenseNet-121 model was used which has shown the best results for X-ray classification.
+    \item BioBERT was trained with biomedical corpora and used to produce semantic mapping.
+\end{itemize}
+
+\subsection{Novelty/Relevance/Hypotheses to be Tested}
+
+This paper outlines a novel technique where an end-to-end trainable network jointly
+learns the visual and semantic representations of diseases. The technique ensures that
+the visual features are well centered around the semantic representations in the
+shared latent space. This is the first proposed model that tackles multi-label
+generalized zero shot learning on medical imaging.
+
+\subsection{Ablations/Extensions Planned}
+
+A potential extension involves enhancing the semantic representation learning by
+incorporating additional medical corpora. Additionally, experimenting with different
+loss functions and regularization techniques could improve generalization to
+unseen classes. The hypothesis in this paper addresses the real limitation of
+traditional models, which are unable to classify diseases not been trained on by
+enabling using learned visual and semantic relationships.
+
+\section{Data Access and Implementation Details}
+
+\subsection{Data and Model Access}
+
+The authors have made their original source code publicly available on the GitHub
+platform, including scripts to train and evaluate the model. The dataset used in this
+project is the NIH Chest X-ray Dataset, which is widely available from different
+sources on the web.
+
+\subsection{Feasibility of Computation}
+
+Reproducing the results presented in the paper seems entirely achievable. The authors, for the greater benefit of research, have generously made both the original code and the dataset used to train and evaluate the model publicly accessible. Upon reviewing the code, we determined the authors utilized well-documented libraries and tools, which not only facilitates our understanding of the model but also provides insight into their intentions behind the implementation. Moreover, the computational resources required to replicate the results are readily available, further making the reproduction of the model achievable.
+
+\subsection{Use of Existing Code}
+
+Our primary goal is to leverage the original source code as a foundation for developing a new iteration that can produce the same results. Considering our limited expertise in this particular topic and the constraints of the project's scope, we anticipate that certain elements of the existing code base will be retained in the new iteration. This approach will allow us to build upon the work already done by the original authors while ensuring we achieve the same outcomes.
+
+% \bibliography{aaai25}
+
+\end{document}
