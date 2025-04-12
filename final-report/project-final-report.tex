@@ -136,31 +136,31 @@ TODO: At the end
 \subsection{Data}
 
 \subsubsection{Download}
-The data can be downloaded by navigating to the NIH's Clinical Center site and clicking on the Download button at the top right of the page (https://nihcc.app.box.com/v/ChestXray-NIHCC)
+The data can be downloaded by navigating to the NIH Clinical Center site and clicking on the Download button at the top right of the page (https://nihcc.app.box.com/v/ChestXray-NIHCC)
 
 \subsubsection{Description}
-The data is found in the Data_Entry_2017_v2020.csh file. The following table outlines the fields available.
-\begin{table}[ht]
-    \centering
-    \caption{Data Description for the Chest X-ray Dataset}
-    \begin{tabular}{l p{8cm} }
-        \hline
-        \textbf{Field} & \textbf{Description} \\
-        \hline
-        Image Index & Unique identifier and filename for each image. \\
-        Finding Labels & Diagnostic findings present in the image. Multiple labels are separated by `|`. \\
-        Follow-up #& Indicator for follow-up examinations\\
-        Patient ID & Unique identifier assigned to each patient. \\
-        Patient Age & Age of the patient at the time of image capture (in years). \\
-        Patient Sex & Biological sex of the patient; typically `M` (male) or `F` (female). \\
-        View Position & The orientation or view of the X-ray (e.g., PA for posteroanterior). \\
-        Original Image Width & The width of the image in pixels. \\
-        Original Image Height & The height of the image in pixels. \\
-        Original Image Pixel Spacing (x) & The physical spacing (resolution) of a pixel along the x-axis. \\
-        Original Image Pixel Spacing (y) & The physical spacing (resolution) of a pixel along the y-axis. \\
-        \hline
-    \end{tabular}
-\end{table}
+The data is found in the Data\_Entry\_2017\_v2020 csv file. The following table outlines the fields available.
+
+
+\newblock
+
+\begin{tabular}{|l|p{0.4\linewidth}|}
+ \hline
+ \textbf{Field} & \textbf{Description} \\
+ Image Index & Unique identifier and filename for each image. \\
+ Finding Labels & Diagnostic findings present in the image. Multiple labels are separated by `|`. \\
+ Follow-up & Indicator for follow-up examinations\\
+ Patient ID & Unique identifier assigned to each patient. \\
+ Patient Age & Age of the patient at the time of image capture (in years). \\
+ Patient Sex & Biological sex of the patient; typically `M` (male) or `F` (female). \\
+ View Position & The orientation or view of the X-ray (e.g., PA for posteroanterior). \\
+ Original Image Width & The width of the image in pixels. \\
+ Original Image Height & The height of the image in pixels. \\
+ Original Image Pixel Spacing (x) & The physical spacing (resolution) of a pixel along the x-axis. \\
+ Original Image Pixel Spacing (y) & The physical spacing (resolution) of a pixel along the y-axis. \\ 
+ \hline
+\end{tabular}
+
 
 \subsection{Model}
 
@@ -170,14 +170,14 @@ Hayat, N., Lashen, H., \& Shamout, F. E. (2021). Multi-Label Generalized Zero Sh
 for the Classification of Disease in Chest Radiographs [arXiv preprint arXiv:2107.06563].
 https://arxiv.org/abs/2107.06563
 
-The paper's original repository can be found \href{https://github.com/nyuad-cai/CXR-ML-GZSL?tab=readme-ov-file#Model-training}{here}
+The paper's original repository can be found here https://github.com/nyuad-cai/CXR-ML-GZSL?tab=readme-ov-file#Model-training
 
 \subsubsection{Model Description}
 
 \begin{itemize}
 
 \item The approach employed deploys a Zero-Shot learning method that uses semantic embeddings along with 
-        visual features to classify images with unseen classes. Both semantic and visual features go through                    mapping modules that project the features into the same latent space where a comparison using Cosine            similarity can be performed.
+        visual features to classify images with unseen classes. Both semantic and visual features go through mapping modules that project the features into the same latent space where a comparison using Cosine            similarity can be performed.
 \begin{itemize}
 \[P^x_C = (f_x,W)\]
 where
