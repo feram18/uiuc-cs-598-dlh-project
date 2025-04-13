@@ -163,21 +163,31 @@ The data is found in the Data\_Entry\_2017\_v2020 csv file. The following table 
 
 
 \subsection{Model}
+\n\
+
 
 \subsubsection{Citation to the Original Paper}
+\n\
 
-Hayat, N., Lashen, H., \& Shamout, F. E. (2021). Multi-Label Generalized Zero Shot Learning
+\n\
+
+
+\begin{quote}
+    Hayat, N., Lashen, H., \& Shamout, F. E. (2021). Multi-Label Generalized Zero Shot Learning
 for the Classification of Disease in Chest Radiographs [arXiv preprint arXiv:2107.06563].
-https://arxiv.org/abs/2107.06563
+https://arxiv.org/abs/2107.06563\
+\end{quote}
 
-The paper's original repository can be found here https://github.com/nyuad-cai/CXR-ML-GZSL?tab=readme-ov-file#Model-training
+The paper's original repository can be found here
 
+\begin{quote}
+    https://github.com/nyuad-cai/CXR-ML-GZSL?tab=readme-ov-file#Model-training
+\end{quote}
 \subsubsection{Model Description}
 
 \begin{itemize}
 
-\item The approach employed deploys a Zero-Shot learning method that uses semantic embeddings along with 
-        visual features to classify images with unseen classes. Both semantic and visual features go through mapping modules that project the features into the same latent space where a comparison using Cosine            similarity can be performed.
+\item The approach used uses a Zero-Shot learning method that uses semantic embeddings along with visual features to classify images with unseen classes. Both semantic and visual features go through mapping modules that project the features into the same latent space where a comparison using Cosine            similarity can be performed.
 \begin{itemize}
 \[P^x_C = (f_x,W)\]
 where
@@ -189,8 +199,7 @@ where
 \end{itemize}
 
 
-\item A confidence margin (\( \delta \)) is enforced to mitigate the hub-ness problem. For a label to be assigned, its 
-        confidence margin must be larger than delta. 
+\item A confidence margin (\( \delta \)) is enforced to mitigate the hub-ness problem. For a label to be assigned, its confidence margin must be larger than delta. 
     \begin{itemize}
 
 \[P_(y_p) - P_(y_n) >= \delta\ \]
