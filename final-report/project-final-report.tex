@@ -131,6 +131,7 @@ TODO: At the end
 \begin{itemize}
     \item Python version 3.6.12 was used for this paper
     \item Conda is used to manage the dependencies for this repository. The full list of dependencies is available in the envrionment.yml file. To install them in an environment, simply execute `conda env create -f environment.yml` in the repository directory followed by `conda activate zsl`
+    \item One legacy dependency is torvision 0.5.0. You may need to independently install a newer version of the dependency as the version included in the original source code is deprecated and difficult to find
 \end{itemize}
 
 \subsection{Data}
@@ -162,51 +163,113 @@ The data is found in the Data\_Entry\_2017\_v2020 csv file. The following table 
 \end{tabular}
 
 
-\subsection{Model}
-\n\
+\subsection{References and Original Repository}
+\begin{itemize}
+    \item Hayat, N., Lashen, H., and Shamout, F. E. (2021). Multi-Label Generalized Zero Shot Learning for the Classification of Disease in Chest Radiographs. arXiv:2107.06563.
+    \item  https://github.com/nyuad-cai/CXR-ML-GZSL?tab=readme-ov-file#Model-training
 
 
-\subsubsection{Citation to the Original Paper}
-\n\
+\section{Model Description}
 
-\n\
+\subsection{Overview}
 
+The CXR-ML-GZSL model is a multi-label generalized zero-shot learning (ML-GZSL) framework developed to classify both seen and unseen diseases in chest X-ray (CXR) images. Traditional supervised deep learning approaches cannot recognize unseen classes during training, but CXR-ML-GZSL addresses this by mapping both visual and semantic information into a joint latent space, allowing inference on unseen diseases. The model is fully end-to-end trainable and uses semantic features derived from BioBERT and visual features extracted from a DenseNet-121.
 
-\begin{quote}
-    Hayat, N., Lashen, H., \& Shamout, F. E. (2021). Multi-Label Generalized Zero Shot Learning
-for the Classification of Disease in Chest Radiographs [arXiv preprint arXiv:2107.06563].
-https://arxiv.org/abs/2107.06563\
-\end{quote}
-
-The paper's original repository can be found here
-
-\begin{quote}
-    https://github.com/nyuad-cai/CXR-ML-GZSL?tab=readme-ov-file#Model-training
-\end{quote}
-\subsubsection{Model Description}
+\subsection{Architecture Components}
 
 \begin{itemize}
-
-\item The approach used uses a Zero-Shot learning method that uses semantic embeddings along with visual features to classify images with unseen classes. Both semantic and visual features go through mapping modules that project the features into the same latent space where a comparison using Cosine            similarity can be performed.
-\begin{itemize}
-\[P^x_C = (f_x,W)\]
-where
-\item (,) is the cosine similarity function
-\item \(f_x\) represents the visual features of the input image x
-\item \(W\) represents the semantic embeddings for all possible classes
-
-
+    \item Visual Encoder: A modified DenseNet-121 CNN removes the final classification layer to output a visual feature vector $f_v \in \mathbb{R}^{1024}$ for each image.
+    
+    \item Visual Projection Module: A 3-layer feedforward neural network projects $f_v$ into a joint latent space:
+    \[
+    f_l = \text{ReLU}(W_3 (\text{ReLU}(W_2(\text{ReLU}(W_1 f_v + b_1)) + b_2)) + b_3)
+    \]
+    
+    \item Semantic Encoder and Projection: Semantic embeddings $w_i \in \mathbb{R}^d$ are extracted from BioBERT and mapped to the same latent space using a projection network $\psi(w_i)$.
+    
+    \item  Cosine similarity is used to compute the relevance between the visual and semantic features in the latent space.
 \end{itemize}
 
+\subsection{Key Equations and Loss Functions}
 
-\item A confidence margin (\( \delta \)) is enforced to mitigate the hub-ness problem. For a label to be assigned, its confidence margin must be larger than delta. 
-    \begin{itemize}
+\begin{itemize}
+    \item Equation 1: The approach used utilizes a Zero-Shot learning method that uses semantic embeddings along with visual features to classify images with unseen classes. Both semantic and visual features go through mapping modules that project the features into the same latent space where a comparison using Cosine similarity can be performed.
+    \[P^x_C = (f_x,W)\]
+where (,) is the cosine similarity function, \(f_x\) represents the visual features of the input image x, and \(W\) represents the semantic embeddings for all possible classes
+
+\item Equation 2: confidence margin (\( \delta \)) is enforced to mitigate the hub-ness problem. For a label to be assigned to an image, its confidence margin must be larger than delta. 
 
 \[P_(y_p) - P_(y_n) >= \delta\ \]
 
     \end{itemize}
-    \item A DenseNet-121 model was used which has shown the best results for X-ray classification.
-    \item BioBERT was trained with biomedical corpora and used to produce semantic mapping.
+
+    \item Equation 3: Latent Space Similarity
+    \[
+    P_S(x) = \langle \phi(x), \psi(W_S) \rangle
+    \]
+    where $\phi(x)$ and $\psi(W_S)$ are the projected visual and semantic representations.
+
+    \item Equation 4: Total Loss Function
+    \[
+    \mathcal{L} = \mathcal{L}_{\text{rank}} + \lambda_1 \mathcal{L}_{\text{align}} + \lambda_2 \mathcal{L}_{\text{con}}
+    \]
+
+    \item Equation 5: Ranking Loss
+    \[
+    \mathcal{L}_{\text{rank}} = \frac{1}{S} \sum_{y_p \in Y^+} \sum_{y_n \in Y^-} \max(0, \delta + p_{y_n} - p_{y_p})
+    \]
+
+    \item Equation 6: Alignment Loss
+    \[
+    \mathcal{L}_{\text{align}} = \frac{1}{N} \sum_{x \in X_s} (1 - \langle \phi(x), \bar{w}_x \rangle)
+    \]
+    where $\bar{w}_x$ is the averaged semantic embedding of all labels for image $x$.
+
+    \item Equation 7: Semantic Consistency Loss
+    \[
+    \mathcal{L}_{\text{con}} = \sum_{i \ne j} \left| \langle w_i, w_j \rangle - \langle \psi(w_i), \psi(w_j) \rangle \right|
+    \]
+\end{itemize}
+
+\subsection{Inputs and Outputs}
+
+Inputs:
+\begin{itemize}
+    \item $x$: a chest X-ray image.
+    \item $y_x \in \{0, 1\}^S$: binary vector of labels.
+    \item $W$: semantic embeddings for all classes..
+\end{itemize}
+
+Outputs:
+\begin{itemize}
+    \item $P_c(x) \in \mathbb{R}^C$: similarity scores for seen and unseen disease classes.
+    \item Top-k labels: used to compute performance metrics like precision and recall.
+\end{itemize}
+
+\subsection{Techniques Used}
+
+\begin{itemize}
+    \item Generalized zero-shot learning for prediction of both seen and unseen diseases.
+    \item Multi-label classification using cosine similarity scoring.
+    \item Domain-specific semantic encoding with BioBERT embeddings.
+    \item Joint latent space projection using dedicated projection networks.
+    \item Margin-based to prioritize relevant labels over irrelevant ones.
+    \item Semantic manifold regularization to preserve inter-class relationships in the semantic space.
+\end{itemize}
+
+\subsection{Pre-trained Models}
+
+The model uses two pre-trained models:
+
+\begin{itemize}
+    \item DenseNet-121 model was pre-trained on ImageNet and fine-tuned end-to-end during training to serve as the visual encoder.
+    \item BioBERT model was trained with biomedical corpora and used to produce semantic mappings.
+\end{itemize}
+
+\subsection{References}
+\begin{itemize}
+    \item Hayat, N., Lashen, H., and Shamout, F. E. (2021). Multi-Label Generalized Zero Shot Learning for the Classification of Disease in Chest Radiographs. arXiv:2107.06563.
+    \item Lee et al. (2018), Mikolov et al. (2013), Rahman et al. (2020), Rajpurkar et al. (2017)
 \end{itemize}
 
 \subsection{Novelty/Relevance/Hypotheses to be Tested}
