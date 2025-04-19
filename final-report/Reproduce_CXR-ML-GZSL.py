@@ -14,9 +14,15 @@ def main():
         beta_rank=1,
         beta_map=0.01,
         beta_con=0.01,
+        bce_only=True,
+        resume_from=None,
+        load_from=None,
+        crop=224,
+        train_file='dataset_splits/train.txt',
+        num_classes=14,
         neg_penalty=0.20,
         textual_embeddings='embeddings/nih_chest_xray_biobert.npy',
-        data_root='/data/shamoutlab/nih_chest_xrays'
+        data_root='C:/Users/Mario/Classes/DL4H/Project/final-report/CXR8/CXR8/images'
     )
 
     seed = 1002
