@@ -9,20 +9,27 @@ def main():
         pretrained=True,
         vision_backbone='densenet121',
         save_dir='checkpoints',
-        epochs=40,
+        epochs=20,
         lr=0.0001,
         beta_rank=1,
         beta_map=0.01,
         beta_con=0.01,
-        bce_only=True,
+        bce_only=False,
         resume_from=None,
         load_from=None,
         crop=224,
         train_file='dataset_splits/train.txt',
         num_classes=14,
         neg_penalty=0.20,
+        batch_size=4,
+        resize=256,
+        wo_con=False,
+        wo_map=False,
+        val_file='dataset_splits/val.txt',
+        test_file='dataset_splits/test.txt',
+        steps='20, 40, 60, 80',
         textual_embeddings='embeddings/nih_chest_xray_biobert.npy',
-        data_root='C:/Users/Mario/Classes/DL4H/Project/final-report/CXR8/CXR8/images'
+        data_root='/mnt/c/Users/Mario/Classes/DL4H/Project/final-report/CXR8/CXR8/images/'
     )
 
     seed = 1002

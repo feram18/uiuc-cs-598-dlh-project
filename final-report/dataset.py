@@ -83,7 +83,6 @@ class NIHChestXray(Dataset):
                 continue
             class_ids = [self._class_ids[label] for label in labels[index]]
             self.class_ids_loaded +=class_ids
-            print(self.names_to_path)
             self._imdb.append({
                 'im_path': self.names_to_path[image_index[index]],
                 'labels': class_ids,
