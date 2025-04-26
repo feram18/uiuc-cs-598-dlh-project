@@ -266,6 +266,65 @@ The model uses two pre-trained models:
     \item BioBERT model was trained with biomedical corpora and used to produce semantic mappings.
 \end{itemize}
 
+
+
+\section{Training and Evaluation}
+
+\subsection{Training Configuration}
+
+The training setup closely follows the original architecture, with modifications tailored for reduced memory consumption. Prior to those changes, training would cause an out of memory error on the consumer grade computer used. The TenCrop augmentation method was removed from  validation and testing, and the batch size was reduced from the original to 4, Training was conducted using a DenseNet-121 model as the visual encoder and BioBERT embeddings for semantic representations. The model is trained end-to-end without requiring pretraining of the feature extractor.
+
+\subsection{Hyperparameters}
+
+We report three categories of hyperparameters:
+
+\begin{itemize}
+    \item \textbf{Learning Rate:} 0.0001. The learning rate was manually tuned based on convergence behavior across epochs and remained constant throughout training.
+    \item \textbf{Batch Size:} 4. This value was decreased from the original implementation.
+    \item \textbf{Projection Module Sizes:} Both the visual and semantic encoders consist of a three-layer fully connected network with hidden sizes of 512 and 256, and an output size of 128, using ReLU activations.
+\end{itemize}
+
+\subsection{Computational Requirements}
+
+The following setup was used to train the model:
+
+\begin{itemize}
+    \item \textbf{Hardware:} Training was performed on a consumer workstation running WSL 2, using an NVIDIA GeForce RTX 2070 Super and an AMD Ryzen 7 7700X with 32 GB of RAM.
+    \item \textbf{Training Duration:} Each epoch took approximately 12–15 minutes with the reduced batch size.
+    \item \textbf{Training Epochs:} The model was trained for 40 epochs.
+    \item \textbf{Total Trials:} Two trials were performed: one selecting the model with minimum validation loss, and one with the highest validation AUROC.
+    \item \textbf{Estimated GPU Usage:} Around 4-6 GPU hours per full trial.
+\end{itemize}
+
+\subsection{Training Details}
+
+The model is trained using a multi-part loss function defined as:
+
+\begin{equation}
+\mathcal{L}_{total} = \mathcal{L}_{rank} + \beta_{map} \cdot \mathcal{L}_{align} + \beta_{con} \cdot \mathcal{L}_{con}
+\end{equation}
+
+Where the loss terms are defined as follows:
+
+\begin{itemize}
+    \item \textbf{Ranking Loss} ($\mathcal{L}_{rank}$): Encourages correct disease labels to have higher similarity scores than incorrect labels by a given margin.
+    \item \textbf{Alignment Loss} ($\mathcal{L}_{align}$): Minimizes cosine distance between image embeddings and the averaged textual embeddings of their ground-truth labels.
+    \item \textbf{Semantic Consistency Loss} ($\mathcal{L}_{con}$): Preserves the pairwise similarities between textual class embeddings after projection into the joint latent space.
+\end{itemize}
+
+\section{Evaluation}
+
+\subsection{Evaluation Metrics}
+
+Evaluation was performed on a test set containing both seen and unseen disease classes. The following metrics were used to assess model performance:
+
+\begin{itemize}
+    \item \textbf{Precision}: The fraction of the top predicted labels that are actually correct.
+    \item \textbf{Recall}: The fraction of relevant (ground truth) labels.
+    \item \textbf{F1 Score}: The harmonic mean of precision and recall. Used to evaluate the tradeoff between precision and recall.
+    \item \textbf{AUROC (Area Under Receiver Operating Characteristic Curve)}: Calculated per class using one-vs-rest evaluation for each disease. We report the average AUROC for seen classes, unseen classes, and the harmonic mean of the two to evaluate the model's generalization capacity.
+\end{itemize}
+
 \subsection{References}
 \begin{itemize}
     \item Hayat, N., Lashen, H., and Shamout, F. E. (2021). Multi-Label Generalized Zero Shot Learning for the Classification of Disease in Chest Radiographs. arXiv:2107.06563.

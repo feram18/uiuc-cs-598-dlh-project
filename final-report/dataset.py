@@ -49,7 +49,7 @@ class NIHChestXray(Dataset):
         max_labels = 0
         paths = glob.glob(f'{self._data_path}/**/images/*.png')
         self.names_to_path = {path.split('/')[-1]: path for path in paths}
-        data_entry_file = 'Data_Entry_2017.csv'
+        data_entry_file = 'Data_Entry_2017_v2020.csv'
         # split_path = os.path.join(self._data_path, self._split)
         print(f'data partition path: {self.split_path}')
         with open(self.split_path, 'r') as f: file_names = f.readlines()
