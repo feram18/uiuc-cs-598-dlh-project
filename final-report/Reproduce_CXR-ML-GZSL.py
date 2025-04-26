@@ -9,7 +9,7 @@ def main():
         pretrained=True,
         vision_backbone='densenet121',
         save_dir='checkpoints',
-        epochs=20,
+        epochs=40,
         lr=0.0001,
         beta_rank=1,
         beta_map=0.01,

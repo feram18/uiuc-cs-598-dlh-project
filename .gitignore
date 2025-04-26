@@ -86,3 +86,7 @@ build/
 # LaTeX intermediate images
 *.eps
 *.ps
+
+
+# Custom
+*/checkpoints/*
