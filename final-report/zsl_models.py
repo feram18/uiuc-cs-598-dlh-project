@@ -19,6 +19,9 @@ class ZSLNet(nn.Module):
         self.args = args
         self.device = device
         self.vision_backbone = getattr(torchvision.models, self.args.vision_backbone)(pretrained=self.args.pretrained)
+
+        self.beta_contrast = 0.1
+
         # remove classification layer from visual encoder
         classifiers = [ 'classifier', 'fc']
         for classifier in classifiers:
@@ -77,16 +80,26 @@ class ZSLNet(nn.Module):
             return self.forward_ranking(x, labels=labels, epoch=epoch, n_crops=n_crops, bs=bs)
 
     def forward_bce_only(self, x, labels=None, n_crops=0, bs=16):
-        lossvalue_bce = torch.zeros(1).to(self.device)
+        loss_bce = torch.zeros(1).to(self.device)
+        loss_contrast = torch.zeros(1).to(self.device)
 
         visual_feats = self.vision_backbone(x)
         preds = self.classifier(visual_feats)
 
         if labels is not None:
-            lossvalue_bce = self.bce_loss(preds, labels)
+            loss_bce = self.bce_loss(preds, labels)
 
-        return preds, lossvalue_bce, f'bce:\t {lossvalue_bce.item():0.4f}'
-    
+            label_embeds = []
+            for i in range(labels.shape[0]):
+                emb = self.textual_embeddings[labels[i] == 1]
+                emb = emb.mean(dim=0, keepdim=True) if emb.shape[0] > 0 else torch.zeros(1, self.textual_embeddings.shape[1]).to(self.device)
+                label_embeds.append(emb)
+            label_embeds = torch.cat(label_embeds)
+
+            loss_contrast = self.contrastive_loss(visual_feats, label_embeds)
+
+        total_loss = loss_bce + self.args.beta_contrast * loss_contrast
+        return preds, total_loss, f"bce: {loss_bce.item():.4f} | contrast: {loss_contrast.item():.4f}"
 
     def forward_ranking(self, x, labels=None, epoch=0, n_crops=0, bs=16):
         loss_rank = torch.zeros(1).to(self.device)
@@ -145,3 +158,11 @@ class ZSLNet(nn.Module):
 
 
         return visual_feats.detach(), mapped_labels_embd.detach()
+
+    def contrastive_loss(self, visual_feats, label_embeddings):
+        visual_feats = F.normalize(visual_feats, dim=1)
+        label_embeddings = F.normalize(label_embeddings, dim=1)
+
+        logits = torch.matmul(visual_feats, label_embeddings.t()) / 0.07
+        labels = torch.arange(len(visual_feats)).to(self.device)
+        return F.cross_entropy(logits, labels)
