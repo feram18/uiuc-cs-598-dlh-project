@@ -11,7 +11,7 @@ from torch.utils.data import DataLoader
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 from sklearn.metrics.ranking import roc_auc_score
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from zsl_models import ZSLNet
 from dataset import NIHChestXray
 from torch.nn.functional import kl_div, softmax, log_softmax
@@ -61,7 +61,8 @@ class ChexnetTrainer(object):
 
     def __call__(self):
         self.train()
-    
+
+
     def step_lr(self, epoch):
         step = self.steps[0]
         for index, s in enumerate(self.steps):
@@ -211,6 +212,37 @@ class ChexnetTrainer(object):
             
     #-------------------------------------------------------------------------------- 
         
+    def precision_recall_f1_at_k(self, y_true, y_pred, ks=[2, 3]):
+        results = {}
+        y_true = y_true.cpu().numpy()
+        y_pred = y_pred.cpu().numpy()
+        
+        for k in ks:
+            precisions, recalls, f1s = [], [], []
+
+            for i in range(y_true.shape[0]):
+                top_k = y_pred[i].argsort()[-k:][::-1]  # indices of top-k scores
+                true_labels = set(np.where(y_true[i] == 1)[0])
+                pred_labels = set(top_k)
+
+                tp = len(true_labels & pred_labels)
+                fp = k - tp
+                fn = len(true_labels - pred_labels)
+
+                precision = tp / k
+                recall = tp / (len(true_labels) + 1e-8)
+                f1 = 2 * precision * recall / (precision + recall + 1e-8) if (precision + recall) > 0 else 0
+
+                precisions.append(precision)
+                recalls.append(recall)
+                f1s.append(f1)
+
+            results[f'precision@{k}'] = np.mean(precisions)
+            results[f'recall@{k}'] = np.mean(recalls)
+            results[f'f1@{k}'] = np.mean(f1s)
+
+        return results
+
     def epochVal (self):
         
         self.model.eval()
@@ -243,7 +275,11 @@ class ChexnetTrainer(object):
         
         aurocIndividual = self.computeAUROC(outGT, outPRED, self.val_dl.dataset.class_ids_loaded)
         self.val_losses.append(lossVal)
-
+        metrics = self.precision_recall_f1_at_k(outGT[:, class_ids], outPRED[:, class_ids], ks=[2,3])
+        for k in [2, 3]:
+            print(f'Precision@{k}: {metrics[f"precision@{k}"]:.4f} | '
+            f'Recall@{k}: {metrics[f"recall@{k}"]:.4f} | '
+            f'F1@{k}: {metrics[f"f1@{k}"]:.4f}')
         return lossVal, aurocIndividual
     
     
@@ -270,10 +306,16 @@ class ChexnetTrainer(object):
                 
 
 
+        
         aurocIndividual = self.computeAUROC(outGT, outPRED, self.test_dl.dataset.class_ids_loaded)
         
         aurocMean = np.array(aurocIndividual).mean()
-        
+        class_ids = self.test_dl.dataset.class_ids_loaded
+        metrics = self.precision_recall_f1_at_k(outGT[:, class_ids], outPRED[:, class_ids], ks=[2, 3])
+        for k in [2, 3]:
+            print(f'TEST Precision@{k}: {metrics[f"precision@{k}"]:.4f} | '
+            f'Recall@{k}: {metrics[f"recall@{k}"]:.4f} | '
+            f'F1@{k}: {metrics[f"f1@{k}"]:.4f}')
         return aurocIndividual
     
     def computeAUROC (self, dataGT, dataPRED, class_ids):
